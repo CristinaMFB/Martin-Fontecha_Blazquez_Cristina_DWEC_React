@@ -326,7 +326,7 @@ app.get('/api/prediccion/:idMunicipio', async (req, res) => {
     const prediccionDiaria = await response2.json();
 
     //Me quedo con el primer elemento que contiene los 7 días
-    const dias = prediccionCompleta[0].prediccion.dia;
+    const dias = prediccionDiaria[0].prediccion.dia;
 
     //Tengo que quedarme solo con lo que necesito de cada dia
     const prediccionDia = dias.map(dia => {
