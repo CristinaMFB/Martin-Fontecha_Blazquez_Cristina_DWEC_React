@@ -7,7 +7,6 @@ function App() {
   const [nombreMunicipio, setNombreMunicipio] = useState("");
   const [provinciaSeleccionada, setProvinciaSeleccionada] = useState("");
   const [municipioSeleccionado, setMunicipioSeleccionado] = useState("");
-  const [codigoPostal, setCodigoPostal] = useState("");
 
   //Provincias y municipios
   const [provinciasLista, setProvinciasLista] = useState([]);
@@ -27,8 +26,7 @@ function App() {
     import("/provincias.json")
     .then((modulo) => {setProvinciasLista(modulo.default);})
     .catch(() => {setError("Error al cargar las provincias");
-
-    })
+    });
   }, []);
 
   //Cargar los municipios al cambiar la provincia
@@ -41,7 +39,7 @@ function App() {
     tengo que convertirlo, ya que en el json uso los números del 1 al 50.
     Lo soluciono de esta manera: Si la provincia solo tiene un dígito, el codigoProvincia va a ser 0 seguido de ese número.
     Si no, es el número que ya tenía*/
-    const codigoProvincia = provinciaSeleccionada.length === 1 ? "0" + provinciaSeleccionado : provinciaSeleccionada;
+    const codigoProvincia = provinciaSeleccionada.length === 1 ? "0" + provinciaSeleccionada : provinciaSeleccionada;
 
     fetch(`http://localhost:3000/api/provincia/${codigoProvincia}/municipios`)
       .then((res) => res.json())
@@ -61,8 +59,6 @@ function App() {
   //FUNCIÓN AL PULSAR EL BOTÓN ACEPTAR
   const buscarPorNombre = () => {};
   const buscarPorProvincia = () => {};
-  const buscarPorCP = () => {};
-
   return (
     <div className="contenedor">
       <h1 className="titulo">PROYECTO APLICACIÓN DEL TIEMPO</h1>
@@ -97,19 +93,7 @@ function App() {
           </select>
           <button onClick={buscarPorProvincia}>Aceptar</button>
         </div>
-        
-        {/*Separador entre tipos de búsqueda*/}
-        <div className="separador"></div>
-
-        {/*Búsqueda por código postal*/}
-        <div className="div-busqueda">
-          <h3>Búsqueda por código postal</h3>
-
-          <input type="text" placeholder="Código postal" value={codigoPostal} onChange={(e) => setCodigoPostal(e.target.value)}/>
-          <button onClick={buscarPorCP}>Aceptar</button>
-        </div>
       </div>
-
       {/*Mostrar predicción por días*/}
       <div className="contenedor-resultados">
         

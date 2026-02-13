@@ -152,7 +152,6 @@ app.get('/', (req, res) => {
     endpoints: {
       '/api/provincia/:codigo/municipios': 'Obtiene los municipios que pertenecen a una provincia',
       '/api/municipio/nombre/:nombre': 'Busca un municipio por su nombre',
-      '/api/cp/:codigoPostal': 'Busca un municipio por código postal',
       '/api/prediccion/:idMunicipio': 'Predicción de 7 días',
       '/api/prediccion-horas/:idMunicipio': 'Predicción por horas del día actual'
     }
@@ -259,43 +258,6 @@ app.get('/api/municipio/nombre/:nombre', async (req, res) => {
       error: 'Error al buscar el municipio por nombre',
       detalles: error.message
     });
-  }
-});
-
-//ENDPOINT: Buscar municipio por código postal
-app.get('/api/cp/:codigoPostal', async (req, res) => {
-  try {
-    //Código postal que introduce el usuario
-    const cpIntroducido = req.params.codigoPostal;
-
-    //Obtengo los municipios
-    const municipios = await obtenerMunicipios();
-
-    //Busco el primer municipio que coincida el código postal
-    //Me quedo únicamente en el primero y no sigo buscando porque no debería haber dos municipios con el mismo código postal
-    const municipioEncontrado = municipios.find(m => m.id_old === cpIntroducido);
-
-    //Si no se encuentra ninguno, se devuelve un error
-    if(!municipioEncontrado) {
-      return res.status(404).json({
-        success: false,
-        error: 'No existe ningún municipio con ese código postal'
-      });
-    }
-
-    //Si lo encuentra, devolver el municipio
-    res.json({
-      success: true,
-      municipio: municipioEncontrado
-    });
-  }
-  catch(error) {
-    console.error('Error al buscar por código postal: ', error.message);
-    res.status(500).json({
-      success: false,
-      error: 'Error al buscar el municipio por código postal',
-      detalles: error.message
-    })
   }
 });
 
