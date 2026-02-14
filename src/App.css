@@ -1,42 +1,142 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+body {
+  margin: 0;
+  padding: 0;
+  font-family:Arial, Helvetica, sans-serif;
+  color: rgb(53, 53, 53);
+}
+
+.contenedor {
+  align-items: center;
+  padding: 20px;
+}
+
+.titulo {
+  text-align: center;
+  font-size: 2.2rem;
+  font-weight: bolder;
+  color: rgb(50, 78, 168);
+  margin-bottom: 30px;
+}
+
+.contenedor-busquedas {
+  display:flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.contenedor-busqueda {
+  background-color : rgb(255, 250, 208);
+  text-align: center;
+  padding: 20px;
+  border-radius: 12px;
+  width: 300px;
+}
+
+.contenedor-busqueda h3 {
+  margin-top: 0;
+  font-size: 1.1rem;
+}
+
+input, select {
+  width: 80%;
+  padding: 10px;
+  margin: 8px 0 8px 0;
+  border-radius: 5px;
+  border: 1px solid rgb(219, 219, 219);
+  color: grey;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background-color: rgb(255, 242, 124);
+  border: 1px solid rgb(190, 190, 190);
+  color: rgb(53, 53, 53);
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  border: 1px solid rgb(114, 114, 114);
+}
+
+.separador {
+  width: 2px;
+  background: white;
+  height: 150px;
+}
+
+.tabla-prediccion {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 40px;
+  background-color: white;
+  border-color: rgb(118, 202, 255);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.tabla-prediccion td {
+  padding: 12px;
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.encabezado-vacio {
+  width: 120px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.encabezado {
+  font-weight: bold;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.celda-fecha {
+  color: rgb(63, 162, 255);
 }
 
-.card {
-  padding: 2em;
+.temp-dia {
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 
-.read-the-docs {
-  color: #888;
+.icono-cielo {
+  font-size: 1.8rem;
+}
+
+.temp {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.temp-min {
+  color: rgb(12, 101, 234);
+}
+
+.temp-max {
+  color: rgb(142, 25, 25);
+}
+
+.viento {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+h3 {
+  margin-top: 0;
+  font-size: 1.1rem;
+  margin-top: 40px; 
+  text-align: center;
+}
+
+.error {
+  color: rgb(198, 0, 0);
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+p {
+  text-align: center;
 }

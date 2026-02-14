@@ -200,10 +200,12 @@ app.get('/api/provincia/:codigo/municipios', async (req, res) => {
 
     //Filtro los municipios que pertenecen a esa provincia y cojo únicamente el id y el nombre, que es lo que me hace falta para rellenar el desplegable
     const municipiosProvincia = municipios
-      .filter(m => m.id_old.startsWith(codigoProvincia))
+      .filter(m => {
+        const idOld = String(m.id_old);
+        return idOld.startsWith(codigoProvincia);
+      })
       .map(m => ({
-        id: m.id, //Voy a devolver este id también
-        id_old:m.id_old,
+        id: String(m.id_old),
         nombre: m.nombre
       }));
 

@@ -74,11 +74,8 @@ function App() {
       setMunicipiosLista([]);
       return;
     }
-    /*La API devuelve el id_old con formato XXXXX, en el caso de números menores a 10, por ejemplo: 01XXX 
-    tengo que convertirlo, ya que en el json uso los números del 1 al 50.
-    Lo soluciono de esta manera: Si la provincia solo tiene un dígito, el codigoProvincia va a ser 0 seguido de ese número.
-    Si no, es el número que ya tenía*/
-    const codigoProvincia = provinciaSeleccionada.length === 1 ? "0" + provinciaSeleccionada : provinciaSeleccionada;
+
+    const codigoProvincia = provinciaSeleccionada;
 
     fetch(`http://localhost:3000/api/provincia/${codigoProvincia}/municipios`)
       .then((res) => res.json())
@@ -116,6 +113,104 @@ function App() {
     return `${media}ºC`;
   }
 
+  /*Unir los datos de la predicción horaria por hora. La AEMET nos devuelve los datos y dentro de cada dato las horas. 
+  Por ejemplo: 
+    "estadoCielo" : [ {
+        "value" : "11n",
+        "periodo" : "07",
+        "descripcion" : "Despejado"
+      }, {
+        "value" : "11",
+        "periodo" : "08",
+        "descripcion" : "Despejado"
+      }, {
+        "value" : "11",
+        "periodo" : "09",
+        "descripcion" : "Despejado"
+      }, 
+  Pero yo quiero sacar todos los datos de la misma hora. Además, tengo que tener en cuenta que el día actual no suele tener todas
+  las horas.*/
+  function unirDatosHora(dia) {
+    //Horas que devuelve AEMET
+    const horasDisponibles = dia.estadoCielo.map(h => h.periodo);
+
+    //Creo un array final solo con esas horas
+    const horas = horasDisponibles.map(h => ({
+      hora: h,
+      estadoCielo: dia.estadoCielo.find(e =>e.periodo === h)?.descripcion || "",
+      temperatura: dia.temperatura.find(t => t.periodo === h)?.value || "",
+      precipitacion: dia.precipitacion.find(p => p.periodo === h)?.value || "",
+      viento: {
+        direccion:dia.vientoAndRachaMax.find(v => v.periodo === h)?.direccion?.[0] || "",
+        velocidad: dia.vientoAndRachaMax.find(v => v.periodo === h)?.velocidad?.[0] || ""
+      }
+    }));
+    return horas;
+  }
+
+  //Cargar las horas del día seleccionado
+  function cargarHoras(indexDia) {
+    setDiaPredHoras(indexDia);
+    const fechaDia = prediccionDiaria[indexDia].fecha.split("T")[0];
+
+    //Buscar ese día en la predicción horaria completa
+    const diaHoras = prediccionHorasComp.find(d => d.fecha.startsWith(fechaDia));
+    
+    if(!diaHoras) {
+      setPrediccionHoras(null);
+      return;
+    }
+
+    //Unir los datos por hora
+    const datosUnidos = unirDatosHora(diaHoras);
+    setPrediccionHoras(datosUnidos);
+  }
+
+  /*TABLA HORAS
+  La tabla por horas la hago con una función aquí, porque quiero separarla en dos tablas. Esto es porque
+  son muchas horas y creo que es más cómodo para el usuario que se separe en dos tablas antes que tener una tabla 
+  que sea muy larga. Mantengo que sea horizontal porque personalmente me gusta más como queda.*/
+  function tablaHoras(listaHoras) {
+    return(
+      <table className="tabla-prediccion">
+        <tr>
+          <td className="encabezado-vacio"></td>
+          {listaHoras.map((h, index) => (
+            <td key={index} className="hora">{h.hora}:00</td>
+          ))}
+        </tr>
+        <tr>
+          <td className="encabezado-vacio"></td>
+          {listaHoras.map((h, index) => (
+            <td key={index} className="temp-dia">{h.temperatura}ºC</td>
+          ))}
+        </tr>
+        <tr>
+          <td className="encabezado-vacio"></td>
+          {listaHoras.map((h, index) => (
+            <td key={index} className="icono-cielo">
+              {iconoDescripcion(h.estadoCielo)}
+            </td>
+          ))}
+        </tr>
+        <tr>
+          <td className="encabezado">Lluvia</td>
+          {listaHoras.map((h, index) => (
+            <td key={index}>{h.precipitacion} mm</td>
+          ))}
+        </tr>
+        <tr>
+          <td className="encabezado">Viento</td>
+          {listaHoras.map((h, index) => (
+            <td key={index} className="viento">
+              <span>{h.viento.direccion}</span>
+              <span>{h.viento.velocidad}km/h</span>
+            </td>
+          ))}
+        </tr>
+      </table>
+    );
+  }
 
   //Búsqueda manual por nombre de municipio
   const busquedaManual = async () => {
@@ -232,7 +327,7 @@ function App() {
               <td className="encabezado-vacio"></td>
               {prediccionDiaria.map((dia, index) => {
                 const fechaFormateada = formatearFecha(dia.fecha);
-                return (<td key={index} className={"celda-fecha"}>{fechaFormateada}</td>);
+                return (<td key={index} className={"fecha"}>{fechaFormateada}</td>);
               })}
             </tr>
             <tr>
@@ -274,7 +369,32 @@ function App() {
                 </td>
               ))}
             </tr>
+            <tr>
+              <td className="encabezado-vacio"></td>
+              {prediccionDiaria.map((dia, index) => {
+                const fechaDia = dia.fecha.split("T")[0];
+                const tieneHoras = Array.isArray(prediccionHorasComp) && prediccionHorasComp.some(d => d.fecha && d.fecha.startsWith(fechaDia));
+                return (
+                  <td key={index}>
+                    {tieneHoras ? (
+                      <button onClick={() => cargarHoras(index)}>Ver predicción por horas</button>
+                    ) : (<></>)}
+                  </td>
+                );
+              })}
+            </tr>
           </table>
+        )}
+        {/*Predicción por horas*/}
+        {diaPredHoras !== null && prediccionHoras && (
+          <>
+            <h3>Predicción por horas del día {formatearFecha(prediccionDiaria[diaPredHoras].fecha)}</h3>
+
+            {/*Tabla de las 00 hasta las 12*/}
+            {tablaHoras(prediccionHoras.slice(0, 12))}
+            {/*Tabla resto de horas*/}
+            {prediccionHoras.length > 12 && tablaHoras(prediccionHoras.slice(12))}
+          </>
         )}
       </div>
     </div>
